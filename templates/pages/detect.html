@@ -1,0 +1,130 @@
+{% extends 'base.html' %} {% block header %}
+<h1>Detection</h1>
+{% endblock %} {% block content %}
+
+<form onSubmit="socketConnect()">
+<div class="form-row">
+  <div class="col-3">
+    <input
+    id="vTruckNo"
+      class="form-control form-control-sm"
+      type="number"
+      placeholder="Enter truck no"
+      required
+    />
+  </div>
+  <div class="col-3">
+    <button
+      id="vStart"
+      type="submit"
+      type="button"
+      class="btn btn-primary btn-sm"
+    >
+      Start
+    </button>
+
+    <button
+      id="vStop"
+      type="button"
+      class="btn btn-danger btn-sm"
+      onclick="socketDisconnect()"
+    >
+      Stop
+    </button>
+  </div>
+</div></br>
+</form>
+
+<div style="text-align: center">
+  <img id="photo" width="640" height="480" />
+  <video id="videoElement" autoplay playsinline></video>
+  <canvas id="canvas" width="640" height="480" hidden="hidden"></canvas>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  videoElement.style.display = "none";
+  document.getElementById("vStart").disabled = false;
+  document.getElementById("vStop").disabled = true;
+
+  // var linkServer = "https://192.200.9.215/"
+  var linkServer =
+    window.location.protocol + "//" + document.domain + ":" + location.port;
+  console.log(linkServer);
+
+  var socket = io.connect(linkServer);
+
+  socket.on("connect", function () {
+    console.log("Connected...!", socket.connected);
+  });
+
+  var photo = document.getElementById("photo");
+  var canvas = document.getElementById("canvas");
+  var context = canvas.getContext("2d");
+  const video = document.querySelector("#videoElement");
+  canvas.style.visibility = "hidden";
+
+  video.width = 640;
+  video.height = 480;
+
+  var MediaStream;
+  var refreshIntervalId = null;
+  function captureWebcam(truckno) {
+   navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then(function (stream) {
+        video.srcObject = stream;
+        video.play();
+        MediaStream = stream.getTracks()[0]; // create the stream tracker
+      })
+      .catch(function (err0r) {});
+
+      const FPS = 6;
+      refreshIntervalId = setInterval(() => {
+        console.log("captureWebcam")
+        width = video.width;
+        height = video.height;
+        context.drawImage(video, 0, 0, width, height);
+        var data = canvas.toDataURL("image/jpeg", 0.5); //1 fullQuality, 0.5 mediumQuality, 0.1 lowQuality
+        context.clearRect(0, 0, width, height);
+        socket.emit("image", data, truckno);
+      }, 1000 / FPS);
+
+      socket.on("response_back", function (image) {
+      // console.log(image);
+      photo.setAttribute("src", image);
+  });
+  } 
+
+  function socketConnect() {
+    var truckno = $("#vTruckNo").val()
+    captureWebcam(truckno);
+    setStart();
+  }
+
+  function socketDisconnect() {
+    clearInterval(refreshIntervalId);
+    MediaStream.stop()
+    setStop();
+  }
+
+  function setStart() {
+    document.getElementById("vTruckNo").disabled = true;
+    document.getElementById("vStart").disabled = true;
+    document.getElementById("vStop").disabled = false;
+  }
+
+  function setStop() {
+    document.getElementById("vTruckNo").disabled = false;
+    document.getElementById("vStart").disabled = false;
+    document.getElementById("vStop").disabled = true;
+  }
+
+  $(document).ready(function() {
+    console.log("loadpage");
+        $('form').on('submit', function(event) {
+            event.preventDefault();
+        });
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+item { 
+	name:'Bruised broken wing (FP09)'
+	id:1
+}
+item { 
+	name:'Bruised broken leg (FP10)'
+	id:2
+}
+item { 
+	name:'Bruised breast (FP11)'
+	id:3
+}
+item { 
+	name:'Bruised back (FP16)'
+	id:4
+}
+item { 
+	name:'Bruised neck (FP22)'
+	id:5
+}
+item { 
+	name:'Bruised elbow (FP32)'
+	id:6
+}
+item { 
+	name:'Whole duck'
+	id:7
+}

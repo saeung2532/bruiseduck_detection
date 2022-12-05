@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Bruiseduck Detection (Local)</title>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="row">
+                <a href="javascript:setImageVisible('myImageId', true)">show image</a>
+                <a href="javascript:setImageVisible('myImageId', false)">hide image</a>
+                <div class="col-lg-8  offset-lg-2">
+                    <img id="myImageId" src="" width="640"  height="480">
+                </div>
+            </div>
+        </div>
+
+    <script>
+    function setImageVisible(id, visible) {
+    var img = document.getElementById(id);
+    // img.style.visibility = (visible ? document.getElementById("myImageId").src = "{{ url_for('video_feed') }}" : img.setAttribute('src', ''));
+    img.style.visibility = (visible ? img.setAttribute('src',"{{ url_for('video_feed') }}") : img.setAttribute('src', ''));
+   
+}
+
+
+
+    </script>
+
+
+    </body>
+
+
+</html>

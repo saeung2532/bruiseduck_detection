@@ -1,0 +1,81 @@
+{% extends 'base.html' %} {% block header %}
+<h1>Report</h1>
+{% endblock %} {% block content %}
+<div style="text-align: center">
+  <div id="jsGrid"></div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+
+  $(document).ready(function () {
+    $("#jsGrid").jsGrid({
+      width: "100%",
+      height: "600px",
+
+      filtering: true,
+    //   editing: true,
+      sorting: true,
+      paging: true,
+      autoload: true,
+
+      pageSize: 15,
+      pageButtonCount: 5,
+
+      pagerFormat: "Pages: {first} {prev} {pages} {next} {last}    {pageIndex} of {pageCount}",
+      pagePrevText: "Prev",
+      pageNextText: "Next",
+      pageFirstText: "First",
+      pageLastText: "Last",
+      pageNavigatorNextText: "...",
+      pageNavigatorPrevText: "...",
+
+      controller: {
+        loadData: function (filter) {
+          console.log(filter);
+          var d = $.Deferred();
+
+          $.ajax({
+            type: "GET",
+            // url: "http://192.200.9.106:8080/br_api/api_data/company",
+            url: "http://localhost:8888/api/v2/back",
+            dataType: "json",
+            data: filter,
+          }).done(function (result) {
+            // console.log(response);
+            result = $.grep(result, function (item) {
+              // client-side filtering below (be sure conditions are correct)
+			  return (!filter.timestamp || item.timestamp === filter.timestamp)
+				&& (!filter.truckno || item.truckno === filter.truckno)
+				&& (!filter.itemcode || item.itemcode === filter.itemcode)
+				&& (!filter.qty || item.qty === filter.qty);
+              
+            });
+            d.resolve(result);
+
+          });
+          return d.promise();
+
+        },
+      },
+
+      fields: [
+        // "date":"2021-09-23T00:00:00.000Z","truckno":1,"itemcode":"FP05","qty":1,"timestamp":"2021-09-24T09:22:42.413Z"
+        { type: "control", modeSwitchButton: false, editButton: true, deleteButton: false, width: 20 },
+        {
+          title: "Date time",
+          name: "timestamp",
+          type: "text",
+          width: 100,
+          align: "left",
+        },
+        // { title: "Date", name: "date", type: "text", width: 100 },
+        { title: "Truck no", name: "truckno", type: "number", width: 50 },
+        { title: "Item code", name: "itemcode", type: "text", width: 50 },
+		    { title: "Item name", name: "itemname", type: "text", width: 100 },
+        { title: "Qty.", name: "qty", type: "number", width: 50 },
+        // { title: "Score", name: "score", type: "number", width: 50  },
+      ],
+    });
+  });
+</script>
+{% endblock %}
