@@ -1,1 +1,1 @@
-# Flask bruiseduck detection with YOLOV4
+# Flask bruiseduck detection with Tensorflow2
